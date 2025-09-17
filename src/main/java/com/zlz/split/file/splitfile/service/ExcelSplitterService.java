@@ -228,21 +228,27 @@ public class ExcelSplitterService {
 
     private String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> {
+
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    yield cell.getDateCellValue().toString();
+                    return cell.getDateCellValue().toString();
                 } else {
-                    yield String.valueOf(cell.getNumericCellValue());
+                    return String.valueOf(cell.getNumericCellValue());
                 }
-            }
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA -> cell.getCellFormula();
-            case BLANK -> "";
-            default -> cell.toString();
-        };
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            case BLANK:
+                return "";
+            default:
+                return cell.toString();
+        }
     }
+
 
     private String getBaseName(String filename) {
         int lastDot = filename.lastIndexOf('.');
