@@ -3,28 +3,28 @@ package com.zlz.split.file.splitfile.service;
 import com.alibaba.fastjson.JSONObject;
 import com.zlz.split.file.splitfile.util.MinioUtil;
 import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.jodconverter.core.DocumentConverter;
-import org.jodconverter.core.office.OfficeManager;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.zlz.split.file.splitfile.constants.Constant.BUCKET_NAME;
-
 @Service
-public class FileProcessor {
+public class FileProcessor implements DisposableBean {
     @Autowired
     private MinioClient minioClient;
     @Autowired
@@ -205,35 +205,9 @@ public class FileProcessor {
         }
     }
 
-//    private String uploadToMinio(byte[] data, String objectName, String contentType) throws Exception {
-//        ByteArrayInputStream bais = new ByteArrayInputStream(data);
-//        minioClient.putObject(
-//                PutObjectArgs.builder()
-//                        .bucket(BUCKET_NAME)
-//                        .object(objectName)
-//                        .stream(bais, data.length, -1)
-//                        .contentType(contentType)
-//                        .build());
-//        return objectName;
-//    }
-
-    private String getFileExtension(String filename) {
-        int lastDot = filename.lastIndexOf('.');
-        return lastDot == -1 ? "" : filename.substring(lastDot + 1);
+    @Override
+    public void destroy() throws Exception {
+        ((AutoCloseable)converter).close();
     }
 
-//    public static void main(String[] args) {
-//        try {
-//            FileProcessor processor = new FileProcessor(
-//                    "http://localhost:9000",  // MinIO 地址
-//                    "YOUR-ACCESSKEY",
-//                    "YOUR-SECRETKEY"
-//            );
-//
-//            processor.processFile("/path/to/your/document.docx"); // 支持 .pdf/.docx/.pptx/.xlsx/.txt
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

@@ -10,6 +10,8 @@ import org.jodconverter.local.office.LocalOfficeManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
+
 import static com.zlz.split.file.splitfile.constants.Constant.*;
 
 @Configuration
@@ -23,8 +25,11 @@ public class AppConfig {
         }else{
             officeManager = LocalOfficeManager.builder().officeHome("/Applications/LibreOffice.app/Contents").build();
         }
-        officeManager.start();
         return officeManager;
+    }
+    @PostConstruct
+    public void init() throws OfficeException {
+        getOfficeManager().start();
     }
 
     @Bean
