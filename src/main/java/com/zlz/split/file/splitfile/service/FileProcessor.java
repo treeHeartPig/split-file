@@ -3,11 +3,11 @@ package com.zlz.split.file.splitfile.service;
 import com.alibaba.fastjson.JSONObject;
 import com.zlz.split.file.splitfile.util.MinioUtil;
 import io.minio.MinioClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.jodconverter.core.DocumentConverter;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
-public class FileProcessor implements DisposableBean {
+public class FileProcessor {
     @Autowired
     private MinioClient minioClient;
     @Autowired
@@ -78,7 +79,6 @@ public class FileProcessor implements DisposableBean {
                     // 继续处理下一页而不是中断整个过程
                 }
             }
-            System.out.println("All pages uploaded: " + pageObjectNames);
         }
         System.out.println("------split-result:"+ JSONObject.toJSONString(result));
         return result;
@@ -203,11 +203,6 @@ public class FileProcessor implements DisposableBean {
             }
             doc.save(pdfFile);
         }
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        ((AutoCloseable)converter).close();
     }
 
 }

@@ -25,11 +25,8 @@ public class AppConfig {
         }else{
             officeManager = LocalOfficeManager.builder().officeHome("/Applications/LibreOffice.app/Contents").build();
         }
+        officeManager.start();
         return officeManager;
-    }
-    @PostConstruct
-    public void init() throws OfficeException {
-        getOfficeManager().start();
     }
 
     @Bean
@@ -40,7 +37,7 @@ public class AppConfig {
                 .build();
     }
 
-    @Bean
+    @Bean(destroyMethod = "close")
     public DocumentConverter getDocumentConverter() throws OfficeException {
         return LocalConverter.make(getOfficeManager());
     }

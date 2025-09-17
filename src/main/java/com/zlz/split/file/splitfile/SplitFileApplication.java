@@ -19,21 +19,6 @@ public class SplitFileApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(SplitFileApplication.class, args);
         manager = context.getBean(OfficeManager.class);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("--开始关闭office");
-
-                if(manager.isRunning()){
-                    try {
-                        manager.stop();
-                        log.info("--完成关闭office");
-                    } catch (OfficeException e) {
-                        log.error("关闭office失败",e);
-                        throw new RuntimeException(e);
-                    }
-                }else {
-                    log.info("--office已关闭");
-                }
-        }));
     }
 
     @PreDestroy
@@ -42,13 +27,13 @@ public class SplitFileApplication {
         if(manager != null && manager.isRunning()){
             try {
                 manager.stop();
-                log.info("--完成关闭office");
+                log.info("--完成关闭officeManager");
             } catch (OfficeException e) {
-                log.error("关闭office失败",e);
+                log.error("关闭officeManager失败",e);
                 throw new RuntimeException(e);
             }
         }else {
-            log.info("--office已关闭");
+            log.info("--officeManager已关闭");
         }
     }
 }
