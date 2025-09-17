@@ -1,5 +1,6 @@
 package com.zlz.split.file.splitfile.config;
 
+import com.zlz.split.file.splitfile.util.OsUtil;
 import io.minio.MinioClient;
 import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.office.OfficeException;
@@ -15,7 +16,13 @@ import static com.zlz.split.file.splitfile.constants.Constant.*;
 public class AppConfig {
     @Bean
     public OfficeManager getOfficeManager() throws OfficeException {
-        OfficeManager officeManager = LocalOfficeManager.builder().officeHome("/Applications/LibreOffice.app/Contents").build();
+        OsUtil.OS os = OsUtil.getOS();
+        OfficeManager officeManager;
+        if (os == OsUtil.OS.WINDOWS) {
+            officeManager = LocalOfficeManager.builder().officeHome("C:\\Program Files\\LibreOffice").build();
+        }else{
+            officeManager = LocalOfficeManager.builder().officeHome("/Applications/LibreOffice.app/Contents").build();
+        }
         officeManager.start();
         return officeManager;
     }
