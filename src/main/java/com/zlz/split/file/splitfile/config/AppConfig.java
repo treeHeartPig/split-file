@@ -2,31 +2,33 @@ package com.zlz.split.file.splitfile.config;
 
 import com.zlz.split.file.splitfile.util.OsUtil;
 import io.minio.MinioClient;
+import lombok.extern.slf4j.Slf4j;
 import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
 import org.jodconverter.local.LocalConverter;
 import org.jodconverter.local.office.LocalOfficeManager;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-
 import static com.zlz.split.file.splitfile.constants.Constant.*;
-
+@Slf4j
 @Configuration
-public class AppConfig {
-    @Bean
-    public OfficeManager getOfficeManager() throws OfficeException {
-        OsUtil.OS os = OsUtil.getOS();
-        OfficeManager officeManager;
-        if (os == OsUtil.OS.WINDOWS) {
-            officeManager = LocalOfficeManager.builder().officeHome("C:\\Program Files\\LibreOffice").build();
-        }else{
-            officeManager = LocalOfficeManager.builder().officeHome("/Applications/LibreOffice.app/Contents").build();
-        }
+public class AppConfig implements InitializingBean, DisposableBean {
+    @Autowired
+    private OfficeManager officeManager;
+    private DocumentConverter converter;
+    @Override
+    public void afterPropertiesSet() throws Exception {
         officeManager.start();
-        return officeManager;
+    }
+
+    @Bean
+    public DocumentConverter getDocumentConverter() throws OfficeException {
+        return LocalConverter.builder().officeManager(officeManager).build();
     }
 
     @Bean
@@ -37,8 +39,27 @@ public class AppConfig {
                 .build();
     }
 
-    @Bean(destroyMethod = "close")
-    public DocumentConverter getDocumentConverter() throws OfficeException {
-        return LocalConverter.make(getOfficeManager());
+    @Override
+    public void destroy() throws Exception {
+        if(officeManager != null && officeManager.isRunning()){
+            new Thread(() -> {
+                try {
+                    officeManager.stop();
+                }catch (OfficeException e){
+                    log.error("关闭officeManager失败",e);
+                }
+            }).start();
+        }
+        if(converter != null){
+            new Thread(() -> {
+                if(converter instanceof AutoCloseable){
+                    try {
+                        ((AutoCloseable)converter).close();
+                    }catch (Exception e){
+                        log.error("关闭converter失败",e);
+                    }
+                }
+            }).start();
+        }
     }
 }

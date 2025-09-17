@@ -11,6 +11,11 @@ spring:
     name: split-file
 
 server:
-  port: 8086
+  port: 8080
   servlet:
     context-path: /split-file
+
+logging:
+  level:
+    org:
+      jodconverter: debug
