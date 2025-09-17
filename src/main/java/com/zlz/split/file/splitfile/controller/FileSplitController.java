@@ -53,7 +53,6 @@ public class FileSplitController {
             if(pdfFile != null){
                 pdfFile.delete();
             }
-            officeManager.stop();
         }
     }
 }

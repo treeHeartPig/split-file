@@ -27,6 +27,8 @@ public class SplitFileApplication {
                         log.error("关闭office失败",e);
                         throw new RuntimeException(e);
                     }
+                }else {
+                    log.info("--office已关闭");
                 }
         }));
     }
