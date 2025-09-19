@@ -33,14 +33,14 @@ public class FileProcessor {
     @Autowired
     private MinioUtil minioUtil;
 
-    public Map<String,Map<Integer,String>> processFile(File pdfFile, String baseName) throws Exception {
-        Map<String,Map<Integer,String>> result = new HashMap<>();
+    public Map<String,Object> processFile(File pdfFile, String baseName) throws Exception {
+        Map<String,Object> result = new HashMap<>();
         // 使用内存优化设置加载PDF
         try (PDDocument document = PDDocument.load(pdfFile,
                 org.apache.pdfbox.io.MemoryUsageSetting.setupTempFileOnly())) {
             List<String> pageObjectNames = new ArrayList<>();
             int totalPages = document.getNumberOfPages();
-            System.out.printf("Processing PDF with %d pages%n", totalPages);
+            result.put("totalPages",totalPages);
 
             Map<Integer,String> pages = new HashMap<>();
             Map<Integer,String> thumbnails = new HashMap<>();
@@ -65,7 +65,6 @@ public class FileProcessor {
                             thumbnails.put(i,MinioUtil.getFileUrl(thumbName));
                         }
                     }
-
                     // 及时清理页面相关资源
                     clearPageResources(img);
                     result.put("pages",pages);

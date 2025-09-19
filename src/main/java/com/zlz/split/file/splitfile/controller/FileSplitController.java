@@ -28,7 +28,7 @@ public class FileSplitController {
     @Autowired
     private OfficeManager officeManager;
     @PostMapping("/upload")
-    public Map<String,Map<Integer,String>> uploadFile(MultipartFile file) throws Exception{
+    public Map<String,Object> uploadFile(MultipartFile file) throws Exception{
         String baseName = FilenameUtils.getBaseName(file.getOriginalFilename());
         File tmpFile = null;
         File pdfFile = null;

@@ -38,16 +38,17 @@ public class ExcelSplitterService {
     /**
      * 主方法：处理上传的Excel文件，按Sheet切分
      */
-    public Map<String,Map<Integer,String>> splitExcelBySheet(MultipartFile file) throws Exception {
-        Map<String,Map<Integer,String>> result = new HashMap<>();
+    public Map<String,Object> splitExcelBySheet(MultipartFile file) throws Exception {
+        Map<String,Object> result = new HashMap<>();
 
         Map<Integer,String> sheets = new HashMap<>();
         Map<Integer,String> thumbs = new HashMap<>();
 
         try (InputStream is = file.getInputStream();
              Workbook workbook = createWorkbook(is, file.getOriginalFilename())) {
-
-            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            int totalSheets = workbook.getNumberOfSheets();
+            result.put("totalPages",totalSheets);
+            for (int i = 0; i < totalSheets; i++) {
                 Sheet sheet = workbook.getSheetAt(i);
                 if (sheet == null) continue;
 
