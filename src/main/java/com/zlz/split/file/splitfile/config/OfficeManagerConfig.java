@@ -27,10 +27,10 @@ public class OfficeManagerConfig {
                     .taskQueueTimeout(30000L)                     // 任务队列超时（毫秒）
                     .build();
         }else{
-            officeManager = LocalOfficeManager.builder().officeHome("/Applications/LibreOffice.app/Contents")
+            officeManager = LocalOfficeManager.builder().officeHome("/usr/lib/libreoffice")
 //                    .processManager(processManager)                // 进程管理器
 //                    .portNumbers(2002, 2003)          // 每个进程的独立端口
-                    .maxTasksPerProcess(50)                      // 进程重启阈值
+                    .maxTasksPerProcess(50)                      // 进程重启阈值s
                     .taskQueueTimeout(30000L)                     // 任务队列超时（毫秒）
                     .build();
         }
