@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,8 @@ public class FileSplitController {
     private OfficeManager officeManager;
     @PostMapping("/upload")
     public Map<String,Object> uploadFile(MultipartFile file) throws Exception{
-        String baseName = FilenameUtils.getBaseName(file.getOriginalFilename());
+        String decodeFileName = URLDecoder.decode(file.getName(), "utf-8");
+        String baseName = FilenameUtils.getBaseName(decodeFileName);
         File tmpFile = null;
         File pdfFile = null;
         try{

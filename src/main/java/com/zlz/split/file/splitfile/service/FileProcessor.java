@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,7 +149,8 @@ public class FileProcessor {
 
 
     public File convertToPdf(File inputFile, String ext) throws Exception {
-        String fileName = FilenameUtils.getBaseName(inputFile.getName());
+        String decodeFileName = URLDecoder.decode(inputFile.getName(), "utf-8");
+        String fileName = FilenameUtils.getBaseName(decodeFileName);
         File outputPdf = new File(inputFile.getParent(), "temp_"+fileName+".pdf");
 
         switch (ext) {
