@@ -1,6 +1,7 @@
 package com.zlz.split.file.splitfile.util;
 
 
+import com.zlz.split.file.splitfile.config.MinioConfig;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import lombok.extern.slf4j.Slf4j;
@@ -9,18 +10,18 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 
-import static com.zlz.split.file.splitfile.constants.Constant.BUCKET_NAME;
-import static com.zlz.split.file.splitfile.constants.Constant.MINIO_URL;
 
 @Service
 @Slf4j
 public class MinioUtil {
     @Autowired
     private MinioClient minioClient;
+    @Autowired
+    private MinioConfig minioConfig;
 
-    public static String getFileUrl(String fileName){
+    public String getFileUrl(String fileName){
         try{
-            return MINIO_URL +"/"+ BUCKET_NAME +"/"+ fileName;
+            return minioConfig.getUrl() +"/"+ minioConfig.getBucketName() +"/"+ fileName;
         }catch (Exception e){
             log.error("--minioUtil#getFileUrl返回异常",e);
             throw e;
@@ -30,7 +31,7 @@ public class MinioUtil {
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         minioClient.putObject(
                 PutObjectArgs.builder()
-                        .bucket(BUCKET_NAME)
+                        .bucket(minioConfig.getBucketName())
                         .object(objectName)
                         .stream(bais, data.length, -1)
                         .contentType(contentType)

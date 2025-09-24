@@ -1,0 +1,7 @@
+
+## minio配置
+minio:
+  url: http://10.29.55.162:9000
+  access-key: atEunTajNwLBzvmt
+  secret-key: NyDAdZsJVGWc0Cab3fFK42jFwD1yW9Vr
+  bucket-name: chat-ai-bucket

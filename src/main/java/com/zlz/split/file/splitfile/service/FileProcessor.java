@@ -52,7 +52,7 @@ public class FileProcessor {
                     String pagePdfName = String.format("%s_page_%d.pdf", baseName, i + 1);
                     byte[] pagePdfBytes = extractPageAsPdf(document, i);
                     minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf");
-                    pages.put(i,MinioUtil.getFileUrl(pagePdfName));
+                    pages.put(i,minioUtil.getFileUrl(pagePdfName));
                     pageObjectNames.add(pagePdfName);
 
                     // Step 2: 生成缩略图
@@ -63,7 +63,7 @@ public class FileProcessor {
                         if (thumbData != null) {
                             String thumbName = String.format("%s_thumb_%d.jpg", baseName, i + 1);
                             minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg");
-                            thumbnails.put(i,MinioUtil.getFileUrl(thumbName));
+                            thumbnails.put(i,minioUtil.getFileUrl(thumbName));
                         }
                     }
                     // 及时清理页面相关资源

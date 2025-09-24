@@ -61,13 +61,13 @@ public class ExcelSplitterService {
 
                 // 上传到 MinIO
                 minioUtil.uploadToMinio(pdfBytes, sheetFileName,"application/pdf");
-                sheets.put(i,MinioUtil.getFileUrl(sheetFileName));
+                sheets.put(i,minioUtil.getFileUrl(sheetFileName));
 
                 // 生成并上传缩略图
                 byte[] thumbnailData = generateThumbnail(sheet, 700, 200);
                 String thumbObjectName = sheetFileName.replace(".pdf", ".thumb.jpg");
                 minioUtil.uploadToMinio(thumbnailData, thumbObjectName,"image/jpeg");
-                thumbs.put(i,MinioUtil.getFileUrl(thumbObjectName));
+                thumbs.put(i,minioUtil.getFileUrl(thumbObjectName));
             }
         }
         result.put("sheets",sheets);

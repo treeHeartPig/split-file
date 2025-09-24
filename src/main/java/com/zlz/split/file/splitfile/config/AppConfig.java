@@ -1,13 +1,11 @@
 package com.zlz.split.file.splitfile.config;
 
-import com.zlz.split.file.splitfile.util.OsUtil;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
 import org.jodconverter.local.LocalConverter;
-import org.jodconverter.local.office.LocalOfficeManager;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +18,8 @@ import static com.zlz.split.file.splitfile.constants.Constant.*;
 public class AppConfig implements InitializingBean, DisposableBean {
     @Autowired
     private OfficeManager officeManager;
+    @Autowired
+    private MinioConfig minioConfig;
     private DocumentConverter converter;
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -34,8 +34,8 @@ public class AppConfig implements InitializingBean, DisposableBean {
     @Bean
     public MinioClient getMinioClient(){
         return MinioClient.builder()
-                .endpoint(MINIO_URL)
-                .credentials(MINIO_ADMIN, MINIO_PWD)
+                .endpoint(minioConfig.getUrl())
+                .credentials(minioConfig.getAccessKey(), minioConfig.getSecretKey())
                 .build();
     }
 

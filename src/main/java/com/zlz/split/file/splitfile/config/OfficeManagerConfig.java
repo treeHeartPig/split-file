@@ -3,9 +3,7 @@ package com.zlz.split.file.splitfile.config;
 import com.zlz.split.file.splitfile.util.OsUtil;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
-import org.jodconverter.local.office.LocalOfficeContext;
 import org.jodconverter.local.office.LocalOfficeManager;
-import org.jodconverter.local.process.ProcessManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
