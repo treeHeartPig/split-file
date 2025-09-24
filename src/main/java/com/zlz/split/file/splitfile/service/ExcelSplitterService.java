@@ -60,14 +60,14 @@ public class ExcelSplitterService {
                         sheet.getSheetName().replaceAll("[^a-zA-Z0-9\u4e00-\u9fa5]", "_"));
 
                 // 上传到 MinIO
-                minioUtil.uploadToMinio(pdfBytes, sheetFileName,"application/pdf");
-                sheets.put(i,minioUtil.getFileUrl(sheetFileName));
+                String path = minioUtil.uploadToMinio(pdfBytes, sheetFileName, "application/pdf");
+                sheets.put(i,minioUtil.getFileUrl(path));
 
                 // 生成并上传缩略图
                 byte[] thumbnailData = generateThumbnail(sheet, 700, 200);
                 String thumbObjectName = sheetFileName.replace(".pdf", ".thumb.jpg");
-                minioUtil.uploadToMinio(thumbnailData, thumbObjectName,"image/jpeg");
-                thumbs.put(i,minioUtil.getFileUrl(thumbObjectName));
+                String path2 = minioUtil.uploadToMinio(thumbnailData, thumbObjectName,"image/jpeg");
+                thumbs.put(i,minioUtil.getFileUrl(path2));
             }
         }
         result.put("sheets",sheets);

@@ -51,8 +51,8 @@ public class FileProcessor {
                     // Step 1: 按页切分并上传 PDF 子页面
                     String pagePdfName = String.format("%s_page_%d.pdf", baseName, i + 1);
                     byte[] pagePdfBytes = extractPageAsPdf(document, i);
-                    minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf");
-                    pages.put(i,minioUtil.getFileUrl(pagePdfName));
+                    String path = minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf");
+                    pages.put(i,minioUtil.getFileUrl(path));
                     pageObjectNames.add(pagePdfName);
 
                     // Step 2: 生成缩略图
@@ -62,8 +62,8 @@ public class FileProcessor {
                         byte[] thumbData = convertImageToBytes(img, "jpg");
                         if (thumbData != null) {
                             String thumbName = String.format("%s_thumb_%d.jpg", baseName, i + 1);
-                            minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg");
-                            thumbnails.put(i,minioUtil.getFileUrl(thumbName));
+                            String path2 = minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg");
+                            thumbnails.put(i,minioUtil.getFileUrl(path2));
                         }
                     }
                     // 及时清理页面相关资源

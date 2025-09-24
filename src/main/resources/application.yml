@@ -9,6 +9,8 @@ spring:
       max-request-size: 100MB
   application:
     name: split-file
+  profiles:
+    active: '@package.environment@'
 
 server:
   port: 8088

@@ -30,7 +30,7 @@ public class FileSplitController {
     private OfficeManager officeManager;
     @PostMapping("/upload")
     public Map<String,Object> uploadFile(MultipartFile file) throws Exception{
-        String decodeFileName = URLDecoder.decode(file.getName(), "utf-8");
+        String decodeFileName = URLDecoder.decode(file.getOriginalFilename(), "utf-8");
         String baseName = FilenameUtils.getBaseName(decodeFileName);
         File tmpFile = null;
         File pdfFile = null;

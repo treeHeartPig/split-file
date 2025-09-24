@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.util.UUID;
 
 
 @Service
@@ -18,6 +19,7 @@ public class MinioUtil {
     private MinioClient minioClient;
     @Autowired
     private MinioConfig minioConfig;
+    private static final String DEFAULT_READ_ASSISTANT_DIR= "read-assistant";
 
     public String getFileUrl(String fileName){
         try{
@@ -28,14 +30,15 @@ public class MinioUtil {
         }
     }
     public String uploadToMinio(byte[] data, String objectName, String contentType) throws Exception {
+        String path = DEFAULT_READ_ASSISTANT_DIR + "/" + UUID.randomUUID() + "/" +objectName;
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(minioConfig.getBucketName())
-                        .object(objectName)
+                        .object(path)
                         .stream(bais, data.length, -1)
                         .contentType(contentType)
                         .build());
-        return objectName;
+        return path;
     }
 }

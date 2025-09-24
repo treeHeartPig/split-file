@@ -4,4 +4,4 @@ minio:
   url: http://10.29.60.153:9001
   access-key: minio
   secret-key: minio@123456
-  bucket-name: chat-ai-buckets
+  bucket-name: chat-ai-bucket

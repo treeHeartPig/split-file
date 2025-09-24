@@ -146,5 +146,32 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>pro</id>
+            <properties>
+                <package.environment>pro</package.environment>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>test</id>
+            <properties>
+                <package.environment>test</package.environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>inner</id>
+            <properties>
+                <package.environment>inner</package.environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>u</id>
+            <properties>
+                <package.environment>u</package.environment>
+            </properties>
+        </profile>
+ </profiles>
 
 </project>
