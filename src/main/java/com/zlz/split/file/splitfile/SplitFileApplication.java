@@ -2,6 +2,8 @@ package com.zlz.split.file.splitfile;
 
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.zlz.split.file.splitfile.config.FontLoaderConfig;
+import com.zlz.split.file.splitfile.util.OsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
@@ -19,6 +21,14 @@ public class SplitFileApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(SplitFileApplication.class, args);
         manager = context.getBean(OfficeManager.class);
+        if(!OsUtil.getOS().equals(OsUtil.OS.WINDOWS)){
+            try{
+                FontLoaderConfig.registerChineseFonts("/usr/share/fonts/truetype/libreoffice");
+                log.info("---字体注册成功-----");
+            }catch (Exception e){
+                log.error("---注册字体失败",e);
+            }
+        }
     }
 
     @PreDestroy
