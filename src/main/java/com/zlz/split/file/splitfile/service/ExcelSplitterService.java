@@ -70,8 +70,8 @@ public class ExcelSplitterService {
                 thumbs.put(i,minioUtil.getFileUrl(path2));
             }
         }
-        result.put("sheets",sheets);
-        result.put("thumbs",thumbs);
+        result.put("pages",sheets);
+        result.put("thumbnails",thumbs);
         return result;
     }
 
