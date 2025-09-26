@@ -19,7 +19,7 @@ public class MinioUtil {
     private MinioClient minioClient;
     @Autowired
     private MinioConfig minioConfig;
-    private static final String DEFAULT_READ_ASSISTANT_DIR= "read-assistant";
+    private static final String DEFAULT_READ_ASSISTANT_DIR= "read-assistant/source/";
 
     public String getFileUrl(String fileName){
         try{
@@ -29,8 +29,8 @@ public class MinioUtil {
             throw e;
         }
     }
-    public String uploadToMinio(byte[] data, String objectName, String contentType) throws Exception {
-        String path = DEFAULT_READ_ASSISTANT_DIR + "/" + UUID.randomUUID() + "/" +objectName;
+    public String uploadToMinio(byte[] data, String objectName, String contentType,String sn) throws Exception {
+        String path = DEFAULT_READ_ASSISTANT_DIR + sn+ "/" + UUID.randomUUID() + "/" +objectName;
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
         minioClient.putObject(
                 PutObjectArgs.builder()

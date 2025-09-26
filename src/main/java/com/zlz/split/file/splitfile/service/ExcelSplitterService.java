@@ -38,7 +38,7 @@ public class ExcelSplitterService {
     /**
      * 主方法：处理上传的Excel文件，按Sheet切分
      */
-    public Map<String,Object> splitExcelBySheet(MultipartFile file) throws Exception {
+    public Map<String,Object> splitExcelBySheet(MultipartFile file,String sn) throws Exception {
         Map<String,Object> result = new HashMap<>();
 
         Map<Integer,String> sheets = new HashMap<>();
@@ -60,18 +60,19 @@ public class ExcelSplitterService {
                         sheet.getSheetName().replaceAll("[^a-zA-Z0-9\u4e00-\u9fa5]", "_"));
 
                 // 上传到 MinIO
-                String path = minioUtil.uploadToMinio(pdfBytes, sheetFileName, "application/pdf");
+                String path = minioUtil.uploadToMinio(pdfBytes, sheetFileName, "application/pdf",sn);
                 sheets.put(i,minioUtil.getFileUrl(path));
 
                 // 生成并上传缩略图
                 byte[] thumbnailData = generateThumbnail(sheet, 700, 200);
                 String thumbObjectName = sheetFileName.replace(".pdf", ".thumb.jpg");
-                String path2 = minioUtil.uploadToMinio(thumbnailData, thumbObjectName,"image/jpeg");
+                String path2 = minioUtil.uploadToMinio(thumbnailData, thumbObjectName,"image/jpeg",sn);
                 thumbs.put(i,minioUtil.getFileUrl(path2));
             }
         }
         result.put("pages",sheets);
         result.put("thumbnails",thumbs);
+        System.out.println("--excel split result:"+result);
         return result;
     }
 

@@ -29,7 +29,7 @@ public class FileSplitController {
     @Autowired
     private OfficeManager officeManager;
     @PostMapping("/upload")
-    public Map<String,Object> uploadFile(MultipartFile file) throws Exception{
+    public Map<String,Object> uploadFile(MultipartFile file,String sn) throws Exception{
         String decodeFileName = URLDecoder.decode(file.getOriginalFilename(), "utf-8");
         String baseName = FilenameUtils.getBaseName(decodeFileName);
         File tmpFile = null;
@@ -40,13 +40,13 @@ public class FileSplitController {
             excelTypes.add("xlsx");
             excelTypes.add("xls");
             if(excelTypes.contains(extension)){
-                return excelSplitterService.splitExcelBySheet(file);
+                return excelSplitterService.splitExcelBySheet(file,sn);
             }
             tmpFile  = File.createTempFile(baseName, "." + extension);
             file.transferTo(tmpFile);
 
             pdfFile = fileProcessor.convertToPdf(tmpFile, extension);
-            return fileProcessor.processFile(pdfFile,baseName);
+            return fileProcessor.processFile(pdfFile,baseName,sn);
         }finally {
             if(tmpFile != null){
                 tmpFile.delete();

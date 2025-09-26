@@ -34,7 +34,7 @@ public class FileProcessor {
     @Autowired
     private MinioUtil minioUtil;
 
-    public Map<String,Object> processFile(File pdfFile, String baseName) throws Exception {
+    public Map<String,Object> processFile(File pdfFile, String baseName,String sn) throws Exception {
         Map<String,Object> result = new HashMap<>();
         // 使用内存优化设置加载PDF
         try (PDDocument document = PDDocument.load(pdfFile,
@@ -51,7 +51,7 @@ public class FileProcessor {
                     // Step 1: 按页切分并上传 PDF 子页面
                     String pagePdfName = String.format("%s_page_%d.pdf", baseName, i + 1);
                     byte[] pagePdfBytes = extractPageAsPdf(document, i);
-                    String path = minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf");
+                    String path = minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf",sn);
                     pages.put(i,minioUtil.getFileUrl(path));
                     pageObjectNames.add(pagePdfName);
 
@@ -62,7 +62,7 @@ public class FileProcessor {
                         byte[] thumbData = convertImageToBytes(img, "jpg");
                         if (thumbData != null) {
                             String thumbName = String.format("%s_thumb_%d.jpg", baseName, i + 1);
-                            String path2 = minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg");
+                            String path2 = minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg",sn);
                             thumbnails.put(i,minioUtil.getFileUrl(path2));
                         }
                     }
@@ -73,7 +73,7 @@ public class FileProcessor {
                 } catch (OutOfMemoryError e) {
                     System.err.printf("Out of memory when processing page %d, trying with lower quality%n", i + 1);
                     // 尝试使用更低质量处理
-                    processPageWithLowMemory(document, i, baseName, pageObjectNames);
+                    processPageWithLowMemory(document, i, baseName, pageObjectNames,sn);
                 } catch (Exception e) {
                     System.err.printf("Error processing page %d: %s%n", i + 1, e.getMessage());
                     // 继续处理下一页而不是中断整个过程
@@ -99,7 +99,7 @@ public class FileProcessor {
 
     // 内存不足时的降级处理
     private void processPageWithLowMemory(PDDocument document, int pageIndex,
-                                          String baseName, List<String> pageObjectNames) throws Exception {
+                                          String baseName, List<String> pageObjectNames,String sn) throws Exception {
         try {
             // 使用更低的DPI重新渲染
             BufferedImage img = renderPageImage(document, pageIndex, 36); // 降低到36 DPI
@@ -107,13 +107,13 @@ public class FileProcessor {
                 // 重新处理该页面
                 String pagePdfName = String.format("%s_page_%d.pdf", baseName, pageIndex + 1);
                 byte[] pagePdfBytes = extractPageAsPdf(document, pageIndex);
-                String pagePdfPath = minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf");
+                String pagePdfPath = minioUtil.uploadToMinio(pagePdfBytes, pagePdfName, "application/pdf",sn);
                 pageObjectNames.add(pagePdfPath);
 
                 byte[] thumbData = convertImageToBytes(img, "jpg");
                 if (thumbData != null) {
                     String thumbName = String.format("%s_thumb_%d.jpg", baseName, pageIndex + 1);
-                    String thumbPath = minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg");
+                    String thumbPath = minioUtil.uploadToMinio(thumbData, thumbName, "image/jpeg",sn);
                     System.out.printf("Uploaded Page %d (low quality): PDF=%s, Thumb=%s%n",
                             pageIndex+1, pagePdfPath, thumbPath);
                 }
