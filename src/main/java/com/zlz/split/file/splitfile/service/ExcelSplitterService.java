@@ -14,6 +14,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.zlz.split.file.splitfile.util.MinioUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.util.StringUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ public class ExcelSplitterService {
      * 主方法：处理上传的Excel文件，按Sheet切分
      */
     public Map<String,Object> splitExcelBySheet(MultipartFile file,String sn) throws Exception {
+        if(StringUtil.isBlank(sn)) sn = "default";
+
         Map<String,Object> result = new HashMap<>();
 
         Map<Integer,String> sheets = new HashMap<>();
@@ -64,7 +67,7 @@ public class ExcelSplitterService {
                 sheets.put(i,minioUtil.getFileUrl(path));
 
                 // 生成并上传缩略图
-                byte[] thumbnailData = generateThumbnail(sheet, 700, 200);
+                byte[] thumbnailData = generateThumbnail(sheet, 700, 1000);
                 String thumbObjectName = sheetFileName.replace(".pdf", ".thumb.jpg");
                 String path2 = minioUtil.uploadToMinio(thumbnailData, thumbObjectName,"image/jpeg",sn);
                 thumbs.put(i,minioUtil.getFileUrl(path2));
@@ -93,7 +96,7 @@ public class ExcelSplitterService {
         ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
 
         // 👉 1. 加载中文字体（关键步骤）
-        String fontPath = "fonts/nxcxs.ttf"; // 路径根据项目结构调整
+        String fontPath = "fonts/msyh.ttf"; // 路径根据项目结构调整
         PdfFont font = PdfFontFactory.createFont(fontPath, PdfEncodings.IDENTITY_H); // 注意：用 IDENTITY_H 支持中文
 
         // 创建PDF文档
@@ -177,16 +180,17 @@ public class ExcelSplitterService {
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, width, height);
 
-        // 字体设置，使用系统默认字体
-        Font font = new Font("SansSerif", Font.PLAIN, 10);
-        g2d.setFont(font);
+        // 字体设置
+        Font normalFont = new Font("SansSerif", Font.PLAIN, 10);
+        Font boldFont = new Font("SansSerif", Font.BOLD, 12);
+        g2d.setFont(normalFont);
         FontMetrics fm = g2d.getFontMetrics();
 
         // 单元格尺寸（动态计算）
         int margin = 5;
-        int cellHeight = 20;
-        int maxCols = Math.min(8, sheet.getRow(0) != null ? sheet.getRow(0).getLastCellNum() : 5); // 最多显示8列
-        int maxRows = Math.min(15, sheet.getLastRowNum() + 1); // 最多显示15行
+        int cellHeight = 35;
+        int maxCols = Math.min(20, sheet.getRow(0) != null ? sheet.getRow(0).getLastCellNum() : 5); // 最多显示20列
+        int maxRows = Math.min(100, sheet.getLastRowNum() + 1); // 最多显示100行
 
         double colWidthPx = (double)(width - 2 * margin) / maxCols;
         double rowHeightPx = (double)(height - 2 * margin) / maxRows;
@@ -207,13 +211,61 @@ public class ExcelSplitterService {
                 g2d.setColor(Color.LIGHT_GRAY);
                 g2d.drawRect((int)x, (int)(y - cellHeight + 2), (int)colWidthPx, cellHeight);
 
+                // 根据是否为第一行设置字体
+                if (r == 0) {
+                    g2d.setFont(boldFont);
+                    fm = g2d.getFontMetrics();
+                } else {
+                    g2d.setFont(normalFont);
+                    fm = g2d.getFontMetrics();
+                }
+
                 // 文本颜色
                 g2d.setColor(Color.BLACK);
-                // 居中裁剪文本
-                String displayText = value.length() > 10 ? value.substring(0, 10) + ".." : value;
-                int textWidth = fm.stringWidth(displayText);
-                int textX = (int)(x + (colWidthPx - textWidth) / 2);
-                g2d.drawString(displayText, Math.max((int)x + 3, textX), (int)y);
+
+                // 文本自动换行处理
+                String displayText = value;
+                int maxWidth = (int)colWidthPx - 6; // 减去边距
+                if (fm.stringWidth(displayText) > maxWidth) {
+                    // 如果文本过长，尝试换行
+                    StringBuilder wrappedText = new StringBuilder();
+                    String[] words = displayText.split("(?<=\\G.{1})"); // 按字符分割
+                    StringBuilder line = new StringBuilder();
+
+                    for (String word : words) {
+                        String testLine = line.toString() + word;
+                        if (fm.stringWidth(testLine) <= maxWidth) {
+                            line.append(word);
+                        } else {
+                            if (line.length() > 0) {
+                                wrappedText.append(line.toString()).append("\n");
+                                line = new StringBuilder(word);
+                            } else {
+                                // 单个字符就超出宽度，强制添加并截断
+                                wrappedText.append(word).append("\n");
+                                break;
+                            }
+                        }
+                    }
+                    wrappedText.append(line.toString());
+
+                    // 只显示前两行
+                    String[] lines = wrappedText.toString().split("\n");
+                    displayText = lines.length > 0 ? lines[0] : "";
+                    if (lines.length > 1) {
+                        displayText += "\n" + (lines[1].length() > 10 ? lines[1].substring(0, 7) + "..." : lines[1]);
+                    }
+                }
+
+                // 绘制文本（支持多行）
+                String[] lines = displayText.split("\n");
+                int lineHeight = fm.getHeight();
+                for (int i = 0; i < lines.length && i < 2; i++) { // 最多显示两行
+                    int textWidth = fm.stringWidth(lines[i]);
+                    int textX = (int)(x + (colWidthPx - textWidth) / 2);
+                    int textY = (int)(y - cellHeight + 2 + (i + 1) * lineHeight);
+                    g2d.drawString(lines[i], Math.max((int)x + 3, textX), textY);
+                }
             }
         }
 
@@ -223,6 +275,7 @@ public class ExcelSplitterService {
         ImageIO.write(image, "jpg", baos);
         return baos.toByteArray();
     }
+
 
     private String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
