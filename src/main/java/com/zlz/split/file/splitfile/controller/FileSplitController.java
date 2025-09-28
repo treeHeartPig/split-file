@@ -4,6 +4,7 @@ import com.zlz.split.file.splitfile.service.ExcelSplitterService;
 import com.zlz.split.file.splitfile.service.FileProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jodconverter.core.office.OfficeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @Slf4j
@@ -31,7 +33,7 @@ public class FileSplitController {
     @PostMapping("/upload")
     public Map<String,Object> uploadFile(MultipartFile file,String sn) throws Exception{
         String decodeFileName = URLDecoder.decode(file.getOriginalFilename(), "utf-8");
-        String baseName = FilenameUtils.getBaseName(decodeFileName);
+        String baseName = checkBaseNameLength(decodeFileName);
         File tmpFile = null;
         File pdfFile = null;
         try{
@@ -55,5 +57,21 @@ public class FileSplitController {
                 pdfFile.delete();
             }
         }
+    }
+
+    @NotNull
+    private static String checkBaseNameLength(String decodeFileName) {
+        String baseName = FilenameUtils.getBaseName(decodeFileName);
+        if (baseName.length() < 3) {
+            StringBuilder sb = new StringBuilder(baseName);
+            Random random = new Random();
+            String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            while (sb.length() < 3) {
+                int index = random.nextInt(chars.length());
+                sb.append(chars.charAt(index));
+            }
+            baseName = sb.toString();
+        }
+        return baseName;
     }
 }
