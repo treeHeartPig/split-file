@@ -40,7 +40,6 @@ public class FileProcessor {
 
     public Map<String,Object> processFile(File pdfFile, String baseName,String sn) throws Exception {
         Map<String,Object> result = new HashMap<>();
-        if(StringUtil.isBlank(sn)) sn = "default";
         // 使用内存优化设置加载PDF
         try (PDDocument document = PDDocument.load(pdfFile,
                 org.apache.pdfbox.io.MemoryUsageSetting.setupTempFileOnly())) {

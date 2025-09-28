@@ -4,6 +4,7 @@ import com.zlz.split.file.splitfile.service.ExcelSplitterService;
 import com.zlz.split.file.splitfile.service.FileProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jodconverter.core.office.OfficeManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class FileSplitController {
         String baseName = checkBaseNameLength(decodeFileName);
         File tmpFile = null;
         File pdfFile = null;
+        if(StringUtil.isBlank(sn)) sn = "default";
         try{
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             List<String> excelTypes = new ArrayList<>();

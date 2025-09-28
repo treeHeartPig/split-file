@@ -9,4 +9,4 @@ minio:
 
 libreoffice:
   home:
-    linux: /usr/bin/libreoffice
+    linux: /opt/libreoffice7.0

@@ -8,4 +8,4 @@ minio:
 
 libreoffice:
   home:
-    linux: /usr/lib/libreoffice
+    linux: /usr/lib64/libreoffice
