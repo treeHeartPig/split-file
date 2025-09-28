@@ -5,8 +5,10 @@ import com.zlz.split.file.splitfile.util.MinioUtil;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.poi.util.StringUtil;
 import org.jodconverter.core.DocumentConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zlz.split.file.splitfile.util.FileUtil.getFontFile;
+
 @Slf4j
 @Service
 public class FileProcessor {
@@ -36,6 +40,7 @@ public class FileProcessor {
 
     public Map<String,Object> processFile(File pdfFile, String baseName,String sn) throws Exception {
         Map<String,Object> result = new HashMap<>();
+        if(StringUtil.isBlank(sn)) sn = "default";
         // 使用内存优化设置加载PDF
         try (PDDocument document = PDDocument.load(pdfFile,
                 org.apache.pdfbox.io.MemoryUsageSetting.setupTempFileOnly())) {
@@ -186,12 +191,14 @@ public class FileProcessor {
         try (BufferedReader reader = Files.newBufferedReader(txtFile.toPath());
              PDDocument doc = new PDDocument()) {
             // 简单文本转PDF（仅示例，可扩展排版）
-            org.apache.pdfbox.pdmodel.PDPage page = new org.apache.pdfbox.pdmodel.PDPage();
+            PDPage page = new PDPage();
             doc.addPage(page);
+            // 从本地字体文件加载字体
+            PDType0Font font = PDType0Font.load(doc, getFontFile("fonts/msyh.ttf"));
 
-            try (org.apache.pdfbox.pdmodel.PDPageContentStream content = new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page)) {
+            try (PDPageContentStream content = new PDPageContentStream(doc, page)) {
                 content.beginText();
-                content.setFont(org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA, 12);
+                content.setFont(font, 12);
                 content.newLineAtOffset(50, 700);
                 String line;
                 float y = 700;
