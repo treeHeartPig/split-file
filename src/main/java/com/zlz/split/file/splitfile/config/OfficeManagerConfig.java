@@ -4,11 +4,14 @@ import com.zlz.split.file.splitfile.util.OsUtil;
 import org.jodconverter.core.office.OfficeException;
 import org.jodconverter.core.office.OfficeManager;
 import org.jodconverter.local.office.LocalOfficeManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OfficeManagerConfig {
+    @Value("${libreoffice.home.linux}")
+    private String libreofficeLinuxHome;
     // 配置进程管理器（启动 4 个 LibreOffice 进程）LocalOfficeProcessManager(4)
 //    ProcessManager processManager = new ProcessPoolOfficeProcessManager(4);
 
@@ -25,7 +28,7 @@ public class OfficeManagerConfig {
                     .taskQueueTimeout(30000L)                     // 任务队列超时（毫秒）
                     .build();
         }else{
-            officeManager = LocalOfficeManager.builder().officeHome("/usr/lib/libreoffice")
+            officeManager = LocalOfficeManager.builder().officeHome(libreofficeLinuxHome)
 //                    .processManager(processManager)                // 进程管理器
 //                    .portNumbers(2002, 2003)          // 每个进程的独立端口
                     .maxTasksPerProcess(50)                      // 进程重启阈值s

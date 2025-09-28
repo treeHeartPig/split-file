@@ -5,3 +5,7 @@ minio:
   access-key: minio
   secret-key: minio@123456
   bucket-name: chat-ai-bucket
+
+libreoffice:
+  home:
+    linux: /usr/lib/libreoffice
