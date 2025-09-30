@@ -159,6 +159,9 @@
             <properties>
                 <package.environment>test</package.environment>
             </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
         <profile>
             <id>inner</id>

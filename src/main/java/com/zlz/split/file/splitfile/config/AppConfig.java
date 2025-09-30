@@ -11,6 +11,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 
 import static com.zlz.split.file.splitfile.constants.Constant.*;
 @Slf4j
@@ -27,6 +28,7 @@ public class AppConfig implements InitializingBean, DisposableBean {
     }
 
     @Bean
+    @Lazy
     public DocumentConverter getDocumentConverter() throws OfficeException {
         return LocalConverter.builder().officeManager(officeManager).build();
     }
