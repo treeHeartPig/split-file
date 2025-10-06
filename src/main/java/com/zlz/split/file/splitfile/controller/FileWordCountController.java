@@ -21,8 +21,10 @@ public class FileWordCountController {
             int wordCount = FileWordCounter.countWordsIgnoringImages(file);
             return ResponseEntity.ok(wordCount);
         } catch (IOException e) {
+            log.error("--------Error counting words-----", e);
             return ResponseEntity.badRequest().body(0);
         } catch (UnsupportedOperationException e) {
+            log.error("--------统计字数接口UnsupportedOperationException----", e);
             return ResponseEntity.badRequest().body(-1);
         }
     }

@@ -27,6 +27,14 @@ public class OfficeManagerConfig {
                     .maxTasksPerProcess(50)                      // 进程重启阈值
                     .taskQueueTimeout(30000L)                     // 任务队列超时（毫秒）
                     .build();
+        }else if (os == OsUtil.OS.MAC){
+            officeManager = LocalOfficeManager.builder()
+                    .officeHome("/Applications/LibreOffice.app/Contents")  // LibreOffice 路径
+//                    .processManager(processManager)                // 进程管理器
+//                    .portNumbers(2002, 2003)          // 每个进程的独立端口
+                    .maxTasksPerProcess(50)                      // 进程重启阈值
+                    .taskQueueTimeout(30000L)                     // 任务队列超时（毫秒）
+                    .build();
         }else{
             officeManager = LocalOfficeManager.builder().officeHome(libreofficeLinuxHome)
 //                    .processManager(processManager)                // 进程管理器
