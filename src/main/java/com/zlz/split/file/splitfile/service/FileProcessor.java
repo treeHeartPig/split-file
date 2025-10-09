@@ -164,6 +164,8 @@ public class FileProcessor {
                 break;
             case "docx":
             case "doc":
+            case "xlsx":
+            case "xls":
             case "pptx":
                 converter.convert(inputFile).to(outputPdf).execute();
                 break;

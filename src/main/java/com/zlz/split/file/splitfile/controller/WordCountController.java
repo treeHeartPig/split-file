@@ -14,7 +14,7 @@ import java.io.IOException;
 @RestController
 @Slf4j
 @RequestMapping("/file")
-public class FileWordCountController {
+public class WordCountController {
     @PostMapping("/count-words")
     public ResponseEntity<Integer> countWords(@RequestParam("file") MultipartFile file) {
         try {

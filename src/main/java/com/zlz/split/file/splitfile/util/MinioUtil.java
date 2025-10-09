@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.UUID;
 
 
@@ -39,6 +42,20 @@ public class MinioUtil {
                         .stream(bais, data.length, -1)
                         .contentType(contentType)
                         .build());
+        return path;
+    }
+
+    public String streamUploadToMinio(File file, String objectName, String contentType, String sn) throws Exception {
+        String path = DEFAULT_READ_ASSISTANT_DIR + sn+ "/" + UUID.randomUUID() + "/" +objectName;
+        try(InputStream inputStream = new FileInputStream(file)) {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(minioConfig.getBucketName())
+                            .object(path)
+                            .stream(inputStream, file.length(), -1)
+                            .contentType(contentType)
+                            .build());
+        }
         return path;
     }
 }
