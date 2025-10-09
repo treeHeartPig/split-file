@@ -51,7 +51,7 @@
             <dependency>
                 <groupId>org.jodconverter</groupId>
                 <artifactId>jodconverter-local</artifactId>
-                <version>4.4.6</version>
+                <version>4.4.5</version>
             </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -167,6 +167,12 @@
             <id>inner</id>
             <properties>
                 <package.environment>inner</package.environment>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <package.environment>dev</package.environment>
             </properties>
         </profile>
         <profile>

@@ -10,7 +10,9 @@ import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.poi.util.StringUtil;
 import org.jodconverter.core.DocumentConverter;
+import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -34,7 +36,11 @@ public class FileProcessor {
     @Autowired
     private MinioClient minioClient;
     @Autowired
+    @Qualifier("defaultConverter")
     private DocumentConverter converter;
+    @Autowired
+    @Qualifier("excelConverter")
+    private DocumentConverter excelConverter;
     @Autowired
     private MinioUtil minioUtil;
 
@@ -166,6 +172,24 @@ public class FileProcessor {
             case "doc":
             case "xlsx":
             case "xls":
+                // ✅ 设置加载属性（Load Properties）
+                Map<String, Object> loadProperties = new HashMap<>();
+                loadProperties.put("Hidden", true); // 后台打开
+
+                // ✅ 设置存储属性（Store Properties）—— 这些是导出为 PDF 时的选项
+                Map<String, Object> storeProperties = new HashMap<>();
+                storeProperties.put("SelectPrintRanges", false);
+                storeProperties.put("FitToPages", true);     // 启用“适应页数”功能
+                storeProperties.put("FitToPagesX", 1);       // 水平方向缩放到 1 页宽
+                storeProperties.put("FitToPagesY", 0);
+
+                // 执行转换并传入属性
+                excelConverter.convert(inputFile)
+                    .as(DefaultDocumentFormatRegistry.XLSX)
+                    .to(outputPdf)
+                    .as(DefaultDocumentFormatRegistry.PDF)
+                    .execute();
+                break;
             case "pptx":
                 converter.convert(inputFile).to(outputPdf).execute();
                 break;

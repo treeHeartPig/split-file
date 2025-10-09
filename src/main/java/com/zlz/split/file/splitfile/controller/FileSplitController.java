@@ -80,8 +80,10 @@ public class FileSplitController {
             file.transferTo(tmpFile);
 
             pdfFile = fileProcessor.convertToPdf(tmpFile, extension);
-            String pdfPath = minioUtil.streamUploadToMinio(pdfFile, baseName, "application/pdf", sn);
-            return minioUtil.getFileUrl(pdfPath);
+            String pdfPath = minioUtil.streamUploadToMinio(pdfFile, baseName+".pdf", "application/pdf", sn);
+            String wholePath = minioUtil.getFileUrl(pdfPath);
+            System.out.println(String.format("-文件:%s 转为pdf格式后，路径为:%s",baseName,wholePath));
+            return wholePath;
         }finally {
             if(tmpFile != null){
                 tmpFile.delete();
@@ -96,6 +98,7 @@ public class FileSplitController {
     @NotNull
     private static String checkBaseNameLength(String decodeFileName) {
         String baseName = FilenameUtils.getBaseName(decodeFileName);
+        baseName=baseName.replaceAll("\\s+","-");
         if (baseName.length() < 3) {
             StringBuilder sb = new StringBuilder(baseName);
             Random random = new Random();

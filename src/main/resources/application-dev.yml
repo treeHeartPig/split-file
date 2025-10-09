@@ -1,0 +1,16 @@
+
+## minio配置
+#minio:
+#  url: http://10.29.60.153:9001
+#  access-key: minio
+#  secret-key: minio@123456
+#  bucket-name: chat-ai-bucket
+minio:
+  url: http://8.159.134.73:9000
+  access-key: admin
+  secret-key: admin123
+  bucket-name: chat-ai-bucket
+
+libreoffice:
+  home:
+    linux: /usr/lib/libreoffice

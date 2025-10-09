@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Slf4j
 @Configuration
 public class AppConfig implements InitializingBean, DisposableBean {
@@ -21,15 +24,34 @@ public class AppConfig implements InitializingBean, DisposableBean {
     @Autowired
     private MinioConfig minioConfig;
     private DocumentConverter converter;
+    private DocumentConverter excelConverter;
     @Override
     public void afterPropertiesSet() throws Exception {
         officeManager.start();
     }
 
-    @Bean
+    @Bean("defaultConverter")
     @Lazy
     public DocumentConverter getDocumentConverter() throws OfficeException {
         return LocalConverter.builder().officeManager(officeManager).build();
+    }
+
+
+    @Bean("excelConverter")
+    @Lazy
+    public DocumentConverter getCustomDocumentConverter() throws OfficeException {
+        Map<String, Object> defaultLoadProps = new HashMap<>();
+        defaultLoadProps.put("Hidden", true);
+
+        Map<String, Object> defaultStoreProps = new HashMap<>();
+        defaultStoreProps.put("FitToPages", true);
+        defaultStoreProps.put("FitToPagesX", 1);
+        defaultStoreProps.put("FitToPagesY", 0);
+        return LocalConverter.builder()
+                .officeManager(officeManager)
+                .loadProperties(defaultLoadProps)
+                .storeProperties(defaultStoreProps)
+                .build();
     }
 
     @Bean
@@ -56,6 +78,17 @@ public class AppConfig implements InitializingBean, DisposableBean {
                 if(converter instanceof AutoCloseable){
                     try {
                         ((AutoCloseable)converter).close();
+                    }catch (Exception e){
+                        log.error("关闭converter失败",e);
+                    }
+                }
+            }).start();
+        }
+        if(excelConverter != null){
+            new Thread(() -> {
+                if(excelConverter instanceof AutoCloseable){
+                    try {
+                        ((AutoCloseable)excelConverter).close();
                     }catch (Exception e){
                         log.error("关闭converter失败",e);
                     }
