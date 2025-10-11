@@ -228,7 +228,9 @@ public class FileProcessor {
                 String line;
                 float y = 700;
                 while ((line = reader.readLine()) != null && y > 50) {
-                    content.showText(line);
+                    //替换 \t为 两个空格
+                    String processLine = line.replace("\t","  ");
+                    content.showText(processLine);
                     content.newLineAtOffset(0, -15);
                     y -= 15;
                 }
