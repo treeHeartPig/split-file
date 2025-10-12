@@ -5,6 +5,7 @@ import com.zlz.split.file.splitfile.util.MinioUtil;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -47,8 +48,7 @@ public class FileProcessor {
     public Map<String,Object> processFile(File pdfFile, String baseName,String sn) throws Exception {
         Map<String,Object> result = new HashMap<>();
         // 使用内存优化设置加载PDF
-        try (PDDocument document = PDDocument.load(pdfFile,
-                org.apache.pdfbox.io.MemoryUsageSetting.setupTempFileOnly())) {
+        try (PDDocument document = Loader.loadPDF(pdfFile)) {
             List<String> pageObjectNames = new ArrayList<>();
             int totalPages = document.getNumberOfPages();
             result.put("totalPages",totalPages);

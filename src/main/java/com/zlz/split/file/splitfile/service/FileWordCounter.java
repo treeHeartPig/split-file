@@ -1,5 +1,7 @@
 package com.zlz.split.file.splitfile.service;
 
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.io.RandomAccessReadBuffer;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -101,7 +103,7 @@ public class FileWordCounter {
 
     // ==================== PDF ====================
     private static int countInPdf(MultipartFile file) throws IOException {
-        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+        try (PDDocument document = Loader.loadPDF(new RandomAccessReadBuffer(file.getInputStream()))) {
             PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(document);
             return countLettersAndChinese(text);
