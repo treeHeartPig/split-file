@@ -24,7 +24,8 @@ public class FileWordCounter {
     private static final Pattern CHINESE_PATTERN = Pattern.compile("[\\u4e00-\\u9fa5]");
     // 匹配英文字母
     private static final Pattern LETTER_PATTERN = Pattern.compile("[a-zA-Z]");
-
+    // 匹配数字
+    private static final Pattern DIGIT_PATTERN = Pattern.compile("[0-9]");
     /**
      * 统计文件中的“字数”（中文字符 + 英文字母），忽略图片
      *
@@ -67,7 +68,8 @@ public class FileWordCounter {
             while ((ch = reader.read()) != -1) {
                 char c = (char) ch;
                 if (CHINESE_PATTERN.matcher(String.valueOf(c)).matches() ||
-                        LETTER_PATTERN.matcher(String.valueOf(c)).matches()) {
+                        LETTER_PATTERN.matcher(String.valueOf(c)).matches() ||
+                        DIGIT_PATTERN.matcher(String.valueOf(c)).matches()) {
                     count++;
                 }
             }
@@ -171,7 +173,8 @@ public class FileWordCounter {
         int count = 0;
         for (char c : text.toCharArray()) {
             if (CHINESE_PATTERN.matcher(String.valueOf(c)).matches() ||
-                    LETTER_PATTERN.matcher(String.valueOf(c)).matches()) {
+                    LETTER_PATTERN.matcher(String.valueOf(c)).matches() ||
+                    DIGIT_PATTERN.matcher(String.valueOf(c)).matches()) {
                 count++;
             }
         }

@@ -19,6 +19,7 @@ public class WordCountController {
     public ResponseEntity<Integer> countWords(@RequestParam("file") MultipartFile file) {
         try {
             int wordCount = FileWordCounter.countWordsIgnoringImages(file);
+            System.out.println("---文件:"+file.getOriginalFilename()+"--字数共："+wordCount);
             return ResponseEntity.ok(wordCount);
         } catch (IOException e) {
             log.error("--------Error counting words-----", e);
