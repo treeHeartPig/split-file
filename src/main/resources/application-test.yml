@@ -1,15 +1,15 @@
 
 ## minio配置
-#minio:
-#  url: http://10.29.60.153:9001
-#  access-key: minio
-#  secret-key: minio@123456
-#  bucket-name: chat-ai-bucket
 minio:
-  url: https://filestore.unisoc.com
-  access-key: atEunTajNwLBzvmt
-  secret-key: NyDAdZsJVGWc0Cab3fFK42jFwD1yW9Vr
+  url: http://10.29.60.153:9001
+  access-key: minio
+  secret-key: minio@123456
   bucket-name: chat-ai-bucket
+#minio:
+#  url: https://filestore.unisoc.com
+#  access-key: atEunTajNwLBzvmt
+#  secret-key: NyDAdZsJVGWc0Cab3fFK42jFwD1yW9Vr
+#  bucket-name: chat-ai-bucket
 
 libreoffice:
   home:
