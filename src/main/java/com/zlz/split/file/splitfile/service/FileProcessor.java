@@ -5,10 +5,11 @@ import com.zlz.split.file.splitfile.util.MinioUtil;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.rendering.PDFRenderer;
-import org.apache.poi.util.StringUtil;
 import org.jodconverter.core.DocumentConverter;
 import org.jodconverter.core.document.DefaultDocumentFormatRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -170,6 +171,12 @@ public class FileProcessor {
                 break;
             case "docx":
             case "doc":
+            case "pptx":
+                converter.convert(inputFile).to(outputPdf).execute();
+                break;
+            case "pdf":
+                Files.copy(inputFile.toPath(), outputPdf.toPath());
+                return inputFile; // 原始就是 PDF
             case "xlsx":
             case "xls":
                 // ✅ 设置加载属性（Load Properties）
@@ -185,17 +192,11 @@ public class FileProcessor {
 
                 // 执行转换并传入属性
                 excelConverter.convert(inputFile)
-                    .as(DefaultDocumentFormatRegistry.XLSX)
-                    .to(outputPdf)
-                    .as(DefaultDocumentFormatRegistry.PDF)
-                    .execute();
+                        .as(DefaultDocumentFormatRegistry.XLSX)
+                        .to(outputPdf)
+                        .as(DefaultDocumentFormatRegistry.PDF)
+                        .execute();
                 break;
-            case "pptx":
-                converter.convert(inputFile).to(outputPdf).execute();
-                break;
-            case "pdf":
-                Files.copy(inputFile.toPath(), outputPdf.toPath());
-                return inputFile; // 原始就是 PDF
             default:
                 throw new IllegalArgumentException("Unsupported file type: " + ext);
         }
