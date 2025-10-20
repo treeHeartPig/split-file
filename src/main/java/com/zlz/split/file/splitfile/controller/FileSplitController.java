@@ -73,9 +73,9 @@ public class FileSplitController {
 
     @RequestMapping(value = {"/convertToPdf"}, method = RequestMethod.POST)
     public String convertToPdf(@RequestParam("file") MultipartFile file, @RequestParam("sn") String sn) throws Exception {
+        log.info("开始转换文件：{}为PDF格式", file.getOriginalFilename());
         String decodeFileName = URLDecoder.decode(file.getOriginalFilename(), "UTF-8");
         String baseName = checkBaseNameLength(decodeFileName);
-
         if (StringUtil.isBlank(sn)) sn = "default";
 
         File tmpFile = null;
@@ -85,23 +85,19 @@ public class FileSplitController {
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             tmpFile = File.createTempFile(baseName, "." + extension);
             file.transferTo(tmpFile);
-
-            // 2. 创建 PDF 输出文件
-//            pdfFile = File.createTempFile(baseName, ".pdf");
-
-            // 3. 使用 JODConverter 转换
+            // 2. 使用 JODConverter 转换
             pdfFile = fileProcessor.convertToPdf(tmpFile, extension);
 
-            // 4. 检查 PDF 是否生成成功
+            // 3. 检查 PDF 是否生成成功
             if (!pdfFile.exists() || pdfFile.length() == 0) {
                 throw new Exception("PDF 转换失败，输出文件为空");
             }
 
-            // 5. 上传到 MinIO
+            // 4. 上传到 MinIO
             String pdfPath = minioUtil.streamUploadToMinio(pdfFile, baseName + ".pdf", "application/pdf", sn);
             String wholePath = minioUtil.getFileUrl(pdfPath);
 
-            System.out.println(String.format("文件:%s 转为PDF，路径为:%s", baseName, wholePath));
+            log.info("完成 转换文件：{}为PDF格式",file.getOriginalFilename());
             return wholePath;
 
         } finally {
