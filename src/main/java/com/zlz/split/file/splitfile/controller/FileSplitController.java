@@ -97,7 +97,7 @@ public class FileSplitController {
             String pdfPath = minioUtil.streamUploadToMinio(pdfFile, baseName + ".pdf", "application/pdf", sn);
             String wholePath = minioUtil.getFileUrl(pdfPath);
 
-            log.info("完成 转换文件：{}为PDF格式",file.getOriginalFilename());
+            log.info("完成 转换文件：{}为PDF格式,pdfPath:{}",file.getOriginalFilename(),pdfPath);
             return wholePath;
 
         } finally {

@@ -12,5 +12,6 @@ minio:
   bucket-name: chat-ai-bucket
 
 libreoffice:
+  tmp-path: /Users/zhuliangzhi/Downloads
   home:
     linux: /usr/lib/libreoffice

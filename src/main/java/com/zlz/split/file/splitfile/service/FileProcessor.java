@@ -1,6 +1,7 @@
 package com.zlz.split.file.splitfile.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.zlz.split.file.splitfile.util.FileUtil;
 import com.zlz.split.file.splitfile.util.MinioUtil;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +45,8 @@ public class FileProcessor {
     private DocumentConverter excelConverter;
     @Autowired
     private MinioUtil minioUtil;
+    @Autowired
+    private FileUtil fileUtil;
 
     public Map<String,Object> processFile(File pdfFile, String baseName,String sn) throws Exception {
         Map<String,Object> result = new HashMap<>();
@@ -171,6 +174,9 @@ public class FileProcessor {
                 break;
             case "docx":
             case "doc":
+                String largeFilePath = fileUtil.processLargeDocument(inputFile);
+                outputPdf = new File(largeFilePath);
+                return outputPdf;
             case "pptx":
                 converter.convert(inputFile).to(outputPdf).execute();
                 break;
