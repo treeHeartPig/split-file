@@ -1,7 +1,10 @@
 package com.zlz.split.file.splitfile.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -11,14 +14,16 @@ import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Pattern;
-
-public class FileWordCounter {
+@Service
+@Slf4j
+public class FileCounterService {
 
     // 匹配中文字符
     private static final Pattern CHINESE_PATTERN = Pattern.compile("[\\u4e00-\\u9fa5]");
@@ -32,7 +37,7 @@ public class FileWordCounter {
      * @param file 上传的 MultipartFile
      * @return 字数
      */
-    public static int countWordsIgnoringImages(MultipartFile file) throws IOException {
+    public int countWordsIgnoringImages(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("文件不能为空");
         }
@@ -179,5 +184,28 @@ public class FileWordCounter {
             }
         }
         return count;
+    }
+
+    public int countPages(InputStream is, String filename) throws IOException {
+        try{
+            if(filename.endsWith(".docx") || filename.endsWith(".DOCX")){
+                XWPFDocument doc = new XWPFDocument(is);
+                return countDocxPages(doc);
+            } else if (filename.endsWith(".doc") || filename.endsWith(".DOC")){
+                return countDocPages(is);
+            }
+        }catch (Exception e){
+            log.error("--FileProcessor#countPages返回异常",e);
+        }
+        return 0;
+    }
+    private int countDocxPages(XWPFDocument doc) {
+        return doc.getProperties().getExtendedProperties().getPages();
+    }
+
+    private int countDocPages(InputStream is) throws IOException {
+        POIFSFileSystem fs = new POIFSFileSystem(is);
+        HWPFDocument document = new HWPFDocument(fs);
+        return document.getSummaryInformation().getPageCount();
     }
 }

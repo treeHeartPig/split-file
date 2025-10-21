@@ -174,9 +174,6 @@ public class FileProcessor {
                 break;
             case "docx":
             case "doc":
-                String largeFilePath = fileUtil.processLargeDocument(inputFile);
-                outputPdf = new File(largeFilePath);
-                return outputPdf;
             case "pptx":
                 converter.convert(inputFile).to(outputPdf).execute();
                 break;

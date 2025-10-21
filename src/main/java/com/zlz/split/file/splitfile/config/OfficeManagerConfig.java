@@ -40,7 +40,8 @@ public class OfficeManagerConfig {
 //                    .processManager(processManager)                // 进程管理器
 //                    .portNumbers(2002, 2003)          // 每个进程的独立端口
                     .maxTasksPerProcess(50)                      // 进程重启阈值s
-                    .taskQueueTimeout(30000L)                     // 任务队列超时（毫秒）
+                    .taskQueueTimeout(240000L)                     // 任务队列超时（毫秒）
+                    .taskExecutionTimeout(240000L)//任务执行超时时间 4分钟
                     .build();
         }
         return officeManager;
