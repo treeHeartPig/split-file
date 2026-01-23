@@ -23,7 +23,7 @@ public class FileCountController {
     public ResponseEntity<Integer> countWords(@RequestParam("file") MultipartFile file) {
         try {
             int wordCount = fileCounterService.countWordsIgnoringImages(file);
-            System.out.println("---文件:"+file.getOriginalFilename()+"--字数共："+wordCount);
+            log.info("---统计字数-文件:{} 共{}字", file.getOriginalFilename(), wordCount);
             return ResponseEntity.ok(wordCount);
         } catch (IOException e) {
             log.error("--------Error counting words-----", e);
@@ -38,7 +38,7 @@ public class FileCountController {
     public ResponseEntity<Integer> countPages(@RequestParam("file") MultipartFile file) {
         try(InputStream is = file.getInputStream()) {
             int pageCount = fileCounterService.countPages(is,file.getOriginalFilename());
-            log.info("----文件:{}共{}页",file.getOriginalFilename(),pageCount);
+            log.info("---统计页数-文件:{} 共{}字", file.getOriginalFilename(), pageCount);
             return ResponseEntity.ok(pageCount);
         } catch (Exception e) {
             log.error("--------统计页数接口UnsupportedOperationException----", e);

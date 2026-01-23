@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -215,8 +216,71 @@ public class FileProcessor {
             return baos.toByteArray();
         }
     }
-
+    private List<String> wrapText(String text, PDType0Font font, int fontSize, float maxWidth) throws  IOException{
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder line = new StringBuilder();
+        for(String word : words){
+            float width = font.getStringWidth(line.toString() + word + " ") * fontSize /100;
+            if(width > maxWidth && line.length() > 0){
+                lines.add(line.toString());
+                line = new StringBuilder(word + " ");
+            }else {
+                line.append(word).append(" ");
+            }
+        }
+        if(line.length() > 0){
+            lines.add(line.toString());
+        }
+        return lines;
+    }
     private void txtToPdf(File txtFile, File pdfFile) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(txtFile.toPath(), StandardCharsets.UTF_8);
+             PDDocument doc = new PDDocument()) {
+            // 从本地字体文件加载字体
+            PDType0Font font = PDType0Font.load(doc, getFontFile("fonts/msyh.ttf"));
+            PDPage page = new PDPage();
+            doc.addPage(page);
+
+            float margin = 50;
+            float pageWidth = page.getMediaBox().getWidth();
+            float maxLineWidth = pageWidth -2 * margin;
+            float y = 770;
+            float leading = 15f;
+
+            PDPageContentStream content = new PDPageContentStream(doc,page);
+            content.beginText();
+            content.setFont(font,12);
+            content.newLineAtOffset(margin,y);
+
+            String line;
+            while ((line = reader.readLine()) !=null){
+                List<String> wrappedLines = wrapText(line,font,12,maxLineWidth);
+                for(String wrappedLine : wrappedLines){
+                    if(y < 50){
+                        //换页
+                        content.endText();
+                        content.close();
+                        page = new PDPage();
+                        doc.addPage(page);
+                        content = new PDPageContentStream(doc,page);
+                        content.beginText();
+                        content.setFont(font,12);
+                        content.newLineAtOffset(margin, 770);
+                        y = 770;
+                    }
+                    content.showText(wrappedLine);
+                    content.newLineAtOffset(0, -leading);
+                    y -= leading;
+                }
+            }
+            content.endText();
+            content.close();
+
+            doc.save(pdfFile);
+        }
+    }
+    private void txtToPdf2(File txtFile, File pdfFile) throws IOException {
         try (BufferedReader reader = Files.newBufferedReader(txtFile.toPath());
              PDDocument doc = new PDDocument()) {
             // 简单文本转PDF（仅示例，可扩展排版）
@@ -233,12 +297,15 @@ public class FileProcessor {
                 float y = 700;
                 while ((line = reader.readLine()) != null && y > 50) {
                     //替换 \t为 两个空格
-                    String processLine = line.replace("\t","  ");
+                    String processLine = line.replace("\t","  ")
+                            .replace("\uF06C"," ");
                     content.showText(processLine);
                     content.newLineAtOffset(0, -15);
                     y -= 15;
                 }
                 content.endText();
+            }catch (Exception e){
+                log.error("--FileProcessor # textToPdf2异常",e);
             }
             doc.save(pdfFile);
         }
