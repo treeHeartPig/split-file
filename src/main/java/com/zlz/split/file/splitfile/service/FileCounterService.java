@@ -5,6 +5,9 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -57,8 +60,8 @@ public class FileCounterService {
             return countInPdf(file);
         } else if (lowerName.endsWith(".pptx")) {
             return countInPptx(file);
-        } else if (lowerName.endsWith(".xlsx")) {
-            return countInXlsx(file);
+        } else if (lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls")) {
+            return countInExcel(file);
         } else {
             throw new UnsupportedOperationException("不支持的文件格式: " + filename);
         }
@@ -137,12 +140,12 @@ public class FileCounterService {
         }
     }
 
-    // ==================== XLSX ====================
-    private static int countInXlsx(MultipartFile file) throws IOException {
-        try (XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream())) {
+    // ==================== excle ====================
+    private static int countInExcel(MultipartFile file) throws IOException {
+        try (Workbook workbook = WorkbookFactory.create(file.getInputStream())) {
             int count = 0;
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-                XSSFSheet sheet = workbook.getSheetAt(i);
+                Sheet sheet = workbook.getSheetAt(i);
                 for (org.apache.poi.ss.usermodel.Row row : sheet) {
                     for (org.apache.poi.ss.usermodel.Cell cell : row) {
                         String text = "";
