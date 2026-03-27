@@ -63,7 +63,8 @@ public class FileCounterService {
         } else if (lowerName.endsWith(".xlsx") || lowerName.endsWith(".xls")) {
             return countInExcel(file);
         } else {
-            throw new UnsupportedOperationException("不支持的文件格式: " + filename);
+            log.warn("不支持的文件格式: " + filename);
+            return 0;
         }
     }
 
